@@ -3,11 +3,11 @@
 # so IntelliSense works on a cold Codespace.
 set -euo pipefail
 
-WPILIB_YEAR="2027_alpha7"
-WPILIB_VER="2027.0.0-alpha-7"
+WPILIB_YEAR="2027_alpha8"
+WPILIB_VER="2027.0.0-alpha-8"
 FRCMAVEN="https://frcmaven.wpi.edu/artifactory/release/org/wpilib/tools"
-ADVANTAGESCOPE_VER="27.0.0-alpha-5"
-ELASTIC_VER="2027.0.0-alpha8"
+ADVANTAGESCOPE_VER="27.0.0-alpha-6"
+ELASTIC_VER="2027.0.0-alpha10"
 
 if [ -n "${XDG_DATA_HOME:-}" ] && [[ "$XDG_DATA_HOME" == /* ]]; then
   WPILIB_HOME="${XDG_DATA_HOME}/wpilib/${WPILIB_YEAR}"

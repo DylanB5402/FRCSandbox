@@ -5,7 +5,7 @@ set -euo pipefail
 
 export DISPLAY="${DISPLAY:-:1}"
 
-WPILIB_YEAR="2027_alpha7"
+WPILIB_YEAR="2027_alpha8"
 if [ -n "${XDG_DATA_HOME:-}" ] && [[ "$XDG_DATA_HOME" == /* ]]; then
   WPILIB_HOME="${XDG_DATA_HOME}/wpilib/${WPILIB_YEAR}"
 else

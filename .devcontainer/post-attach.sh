@@ -8,7 +8,7 @@ if [ "${CODESPACES:-}" != "true" ]; then
   exit 0
 fi
 
-WPILIB_VSIX_VERSION="2027.0.0-alpha-7"
+WPILIB_VSIX_VERSION="2027.0.0-alpha-8"
 echo "Installing WPILib VS Code extension ${WPILIB_VSIX_VERSION}..."
 wget -q "https://github.com/wpilibsuite/vscode-wpilib/releases/download/v${WPILIB_VSIX_VERSION}/vscode-wpilib-${WPILIB_VSIX_VERSION}.vsix" \
   -O /tmp/vscode-wpilib.vsix

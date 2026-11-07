@@ -50,7 +50,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # WPILib is not on the Marketplace ("use the installer"). Pre-extract the VSIX
 # so local Dev Containers have the files before VS Code Server scans extensions.
 # Codespaces still needs `code --install-extension` in post-attach.sh.
-ARG WPILIB_VSIX_VERSION=2027.0.0-alpha-7
+ARG WPILIB_VSIX_VERSION=2027.0.0-alpha-8
 RUN EXT_DIR=/home/vscode/.vscode-server/extensions/wpilibsuite.vscode-wpilib-${WPILIB_VSIX_VERSION} \
     && mkdir -p "$EXT_DIR" \
     && wget -q "https://github.com/wpilibsuite/vscode-wpilib/releases/download/v${WPILIB_VSIX_VERSION}/vscode-wpilib-${WPILIB_VSIX_VERSION}.vsix" \
