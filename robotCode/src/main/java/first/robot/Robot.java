@@ -15,6 +15,7 @@ import first.robot.simulation.DrivetrainSim;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.framework.OpModeRobot;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
 
@@ -24,13 +25,15 @@ import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
+
+  private final CANBus canBus = new CANBus(CANPort.CAN_S0);
   private final int leftLeaderID = 0;
-  public TalonFX leftLeader = new TalonFX(leftLeaderID, CANBus.systemcore(0));
-  private TalonFX leftFollower = new TalonFX(1, CANBus.systemcore(0));
+  public TalonFX leftLeader = new TalonFX(leftLeaderID, canBus);
+  private TalonFX leftFollower = new TalonFX(1, canBus);
 
   private final int rightLeaderID = 2;
-  public TalonFX rightLeader = new TalonFX(rightLeaderID, CANBus.systemcore(0));
-  private TalonFX rightFollower = new TalonFX(3, CANBus.systemcore(0));
+  public TalonFX rightLeader = new TalonFX(rightLeaderID, canBus);
+  private TalonFX rightFollower = new TalonFX(3, canBus);
 
   public final DifferentialDrive drivetrain =
       new DifferentialDrive(leftLeader::setThrottle, rightLeader::setThrottle);
@@ -39,8 +42,8 @@ public class Robot extends TimedRobot {
 
   private DrivetrainSim drivetrainSim = new DrivetrainSim(leftLeader, rightLeader);
 
-  public TalonFX intakeLauncher = new TalonFX(4, CANBus.systemcore(0));
-  public TalonFX feeder = new TalonFX(5, CANBus.systemcore(0));
+  public TalonFX intakeLauncher = new TalonFX(4, canBus);
+  public TalonFX feeder = new TalonFX(5, canBus);
 
   private final XboxController xboxController = new XboxController(0);
   /**

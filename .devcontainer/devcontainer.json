@@ -25,7 +25,7 @@
   "runArgs": [
     "--shm-size=2g"
   ],
-  "forwardPorts": [6080, 5901],
+  "forwardPorts": [6080, 5901, 5808, 5810],
   "portsAttributes": {
     "6080": {
       "label": "Sim desktop (noVNC)",
@@ -33,6 +33,15 @@
     },
     "5901": {
       "label": "Sim desktop (VNC)",
+      "onAutoForward": "silent"
+    },
+    "5808": {
+      "label": "AdvantageScope Lite",
+      "protocol": "http",
+      "onAutoForward": "openBrowserOnce"
+    },
+    "5810": {
+      "label": "NetworkTables (sim)",
       "onAutoForward": "silent"
     }
   },
@@ -44,7 +53,11 @@
       ],
       "settings": {
         "java.configuration.updateBuildConfiguration": "automatic",
-        "wpilib.skipSelectSimulateExtension": true
+        "wpilib.skipSelectSimulateExtension": true,
+        "workbench.browser.enableRemoteProxy": true,
+        "workbench.browser.dataStorage": "workspace",
+        "workbench.browser.openLocalhostLinks": true,
+        "workbench.browser.newTabPlacement": "sideGroup"
       }
     }
   }

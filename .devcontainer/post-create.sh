@@ -82,21 +82,6 @@ install_native_tool "SysId" "sysid"
 install_native_tool "DataLogTool" "datalogtool"
 install_native_tool "wpical" "wpical"
 
-echo "Installing AdvantageScope..."
-mkdir -p "${WPILIB_HOME}/advantagescope"
-wget -q "https://github.com/Mechanical-Advantage/AdvantageScope/releases/download/v${ADVANTAGESCOPE_VER}/advantagescope-wpilib-linux-x64.zip" \
-  -O /tmp/advantagescope.zip
-unzip -qo /tmp/advantagescope.zip -d "${WPILIB_HOME}/advantagescope"
-chmod +x "${WPILIB_HOME}/advantagescope/advantagescope-wpilib"
-cat > "${TOOLS_DIR}/AdvantageScope" <<LAUNCHER
-#!/bin/bash
-cd "${WPILIB_HOME}/advantagescope"
-exec ./advantagescope-wpilib --no-sandbox "\$@"
-LAUNCHER
-chmod +x "${TOOLS_DIR}/AdvantageScope"
-ln -sfn AdvantageScope "${TOOLS_DIR}/advantagescope"
-rm -f /tmp/advantagescope.zip
-
 echo "Installing Elastic..."
 mkdir -p "${WPILIB_HOME}/elastic"
 wget -q "https://github.com/Gold872/elastic_dashboard/releases/download/v${ELASTIC_VER}/Elastic-WPILib-Linux.zip" \
@@ -111,6 +96,36 @@ LAUNCHER
 chmod +x "${TOOLS_DIR}/Elastic"
 ln -sfn Elastic "${TOOLS_DIR}/elastic"
 rm -f /tmp/elastic.zip
+
+# AdvantageScope Lite: extract the Systemcore IPK (ar + data.tar.gz). Do not run
+# postinst/systemd — those assume User=systemcore. Serve with a local venv.
+echo "Installing AdvantageScope Lite..."
+ASCOPE_LITE_DIR="${WPILIB_HOME}/advantagescope-lite"
+ASCOPE_LITE_STAGE="/tmp/ascope-lite-ipk"
+rm -rf "$ASCOPE_LITE_DIR" "$ASCOPE_LITE_STAGE"
+mkdir -p "$ASCOPE_LITE_DIR" "$ASCOPE_LITE_STAGE"
+wget -q "https://github.com/Mechanical-Advantage/AdvantageScope/releases/download/v${ADVANTAGESCOPE_VER}/advantagescope-lite-v${ADVANTAGESCOPE_VER}.ipk" \
+  -O "${ASCOPE_LITE_STAGE}/lite.ipk"
+(
+  cd "$ASCOPE_LITE_STAGE"
+  ar x lite.ipk
+  tar -xzf data.tar.gz
+)
+cp -a "${ASCOPE_LITE_STAGE}/usr/local/bin/advantagescope-lite/." "$ASCOPE_LITE_DIR/"
+chmod +x "${ASCOPE_LITE_DIR}/lite_server.py"
+python3 -m venv "${ASCOPE_LITE_DIR}/.venv"
+"${ASCOPE_LITE_DIR}/.venv/bin/pip" install --quiet --disable-pip-version-check "multipart==1.3.0"
+START_LITE_SCRIPT="$(cd "$(dirname "$0")" && pwd)/start-advantagescope-lite.sh"
+cat > "${TOOLS_DIR}/AdvantageScope" <<LAUNCHER
+#!/bin/bash
+# WPILib tool entry: ensure Lite is listening, then print a clickable URL.
+bash "${START_LITE_SCRIPT}"
+echo "AdvantageScope Lite: http://localhost:5808"
+echo "Open that link in the integrated browser, then File → Connect to Simulator."
+LAUNCHER
+chmod +x "${TOOLS_DIR}/AdvantageScope"
+ln -sfn AdvantageScope "${TOOLS_DIR}/advantagescope"
+rm -rf "$ASCOPE_LITE_STAGE"
 
 cat > "${TOOLS_DIR}/tools.json" <<EOF
 [
@@ -132,30 +147,7 @@ for rc in "${HOME}/.bashrc" "${HOME}/.zshrc"; do
   printf '\n# WPILib 2027 tools\n%s\n' "$PATH_LINE" >> "$rc"
 done
 
-# Fluxbox (not postStart) owns GUI autostart so AdvantageScope survives the
-# Dev Container process group. -desktop fluxbox still exec's ~/.fluxbox/startup
-# when that file is executable.
-mkdir -p "${HOME}/.fluxbox"
-FLUXBOX_STARTUP="${HOME}/.fluxbox/startup"
-if [ ! -f "$FLUXBOX_STARTUP" ] || ! grep -Fq "AdvantageScope" "$FLUXBOX_STARTUP"; then
-  cat > "$FLUXBOX_STARTUP" <<EOF
-#!/bin/sh
-export DISPLAY="\${DISPLAY:-:1}"
-(
-  sleep 2
-  if [ -x "${TOOLS_DIR}/AdvantageScope" ] && ! pgrep -f advantagescope-wpilib >/dev/null; then
-    "${TOOLS_DIR}/AdvantageScope"
-  fi
-) >/tmp/advantagescope.log 2>&1 &
-exec fluxbox
-EOF
-  chmod +x "$FLUXBOX_STARTUP"
-fi
-
-# Current VNC session already started fluxbox before this script ran.
-if pgrep -x fluxbox >/dev/null && [ -x "${TOOLS_DIR}/AdvantageScope" ]; then
-  bash "$(dirname "$0")/start-advantagescope.sh" || true
-fi
+bash "$(dirname "$0")/start-advantagescope-lite.sh" || true
 
 if [ -f gradlew ]; then
   chmod +x gradlew
@@ -167,11 +159,14 @@ cat <<EOF
 
 WPILib 2027 sim container is ready.
 
-  Desktop: open forwarded port 6080 (password: vscode)
-  Build:   ./gradlew compileJava
-  Sim:     ./gradlew run
-           or Command Palette → WPILib: Simulate Robot Code
+  Desktop:          open forwarded port 6080 (password: vscode)
+  AdvantageScope:   http://localhost:5808
+                    (integrated browser via remote proxy; Run and Debug → AdvantageScope Lite)
+                    With sim running: File → Connect to Simulator
+  Build:            ./gradlew compileJava
+  Sim:              ./gradlew run
+                    or Command Palette → WPILib: Simulate Robot Code
 
-The sim GUI appears on the noVNC desktop, not in this terminal.
+The sim GUI appears on the noVNC desktop. AdvantageScope Lite renders in the integrated browser.
 
 EOF

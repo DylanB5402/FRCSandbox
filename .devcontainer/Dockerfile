@@ -6,13 +6,15 @@ FROM mcr.microsoft.com/devcontainers/java:25-trixie
 
 USER root
 
-# Runtime libs for the prebuilt sim GUI / Glass / Elastic / AdvantageScope
-# binaries (SDL3 in 2027, plus Mesa software GL for Codespaces).
+# Runtime libs for the prebuilt sim GUI / Glass / Elastic binaries
+# (SDL3 in 2027, plus Mesa software GL for Codespaces).
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         wget \
         unzip \
+        binutils \
         python3 \
+        python3-venv \
         x11-apps \
         libgl1 \
         libglu1-mesa \
