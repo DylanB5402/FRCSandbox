@@ -8,7 +8,7 @@
   "postAttachCommand": "bash .devcontainer/post-attach.sh",
   "waitFor": "postCreateCommand",
   "hostRequirements": {
-    "cpus": 4,
+    "cpus": 2,
     "memory": "8gb"
   },
   "features": {
