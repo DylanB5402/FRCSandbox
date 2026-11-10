@@ -6,7 +6,9 @@ set -euo pipefail
 WPILIB_YEAR="2027_alpha8"
 WPILIB_VER="2027.0.0-alpha-8"
 FRCMAVEN="https://frcmaven.wpi.edu/artifactory/release/org/wpilib/tools"
-ADVANTAGESCOPE_VER="27.0.0-alpha-6"
+# DylanB5402 fork: Lite with hard-coded wss:// for Codespaces HTTPS proxy / NT.
+ADVANTAGESCOPE_REPO="DylanB5402/AdvantageScope"
+ADVANTAGESCOPE_VER="codespace-wss-1"
 ELASTIC_VER="2027.0.0-alpha10"
 
 if [ -n "${XDG_DATA_HOME:-}" ] && [[ "$XDG_DATA_HOME" == /* ]]; then
@@ -104,7 +106,7 @@ ASCOPE_LITE_DIR="${WPILIB_HOME}/advantagescope-lite"
 ASCOPE_LITE_STAGE="/tmp/ascope-lite-ipk"
 rm -rf "$ASCOPE_LITE_DIR" "$ASCOPE_LITE_STAGE"
 mkdir -p "$ASCOPE_LITE_DIR" "$ASCOPE_LITE_STAGE"
-wget -q "https://github.com/Mechanical-Advantage/AdvantageScope/releases/download/v${ADVANTAGESCOPE_VER}/advantagescope-lite-v${ADVANTAGESCOPE_VER}.ipk" \
+wget -q "https://github.com/${ADVANTAGESCOPE_REPO}/releases/download/${ADVANTAGESCOPE_VER}/advantagescope-lite-${ADVANTAGESCOPE_VER}.ipk" \
   -O "${ASCOPE_LITE_STAGE}/lite.ipk"
 (
   cd "$ASCOPE_LITE_STAGE"
