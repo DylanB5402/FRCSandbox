@@ -190,13 +190,14 @@ WPILib 2027 sim container is ready.
 
   Desktop:          open forwarded port 6080 (password: vscode)
   AdvantageScope:   ${ASCOPE_LITE_URL}
-                    (public HTTPS forward; ports 5808 + 5810 must stay public)
+                    (Codespaces forward URL; 5808 can stay private for you)
                     With sim running, Lite auto-connects to NT (${ASCOPE_NT_HOST})
+                    Port 5810 is made public on attach (required for browser WSS)
   Build:            ./gradlew compileJava
   Sim:              ./gradlew run
                     or Command Palette → WPILib: Simulate Robot Code
 
-The sim GUI appears on the noVNC desktop. AdvantageScope Lite opens over HTTPS and
-talks to sim NT over WSS via the public 5810 forward.
+The sim GUI appears on the noVNC desktop. AdvantageScope Lite talks to sim NT over
+WSS via the public 5810 Codespaces forward.
 
 EOF

@@ -21,15 +21,21 @@ done
 cat <<EOF
 
 AdvantageScope Lite: ${ASCOPE_LITE_URL}
-  Open that HTTPS link (Ports → 5808, or the URL above).
+  Open that link (Ports → 5808, or the URL above).
   With sim running, Lite auto-connects to NT at ${ASCOPE_NT_HOST} over WSS.
-  Keep ports 5808 and 5810 public.
+  Port 5810 must be public (set below on Codespaces attach).
 
 EOF
 
 if [ "${CODESPACES:-}" != "true" ]; then
   exit 0
 fi
+
+# portsAttributes.visibility is ignored by Codespaces; set NT public at runtime
+# so the Lite page can reach WSS on *-5810.app.github.dev without auth headers.
+echo "Making NetworkTables port 5810 public..."
+gh codespace ports visibility 5810:public -c "$CODESPACE_NAME" || \
+  echo "Warning: could not set 5810 public; toggle it in the Ports panel."
 
 WPILIB_VSIX_VERSION="2027.0.0-alpha-8"
 echo "Installing WPILib VS Code extension ${WPILIB_VSIX_VERSION}..."
