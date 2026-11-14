@@ -37,13 +37,13 @@
     },
     "5808": {
       "label": "AdvantageScope Lite",
-      "protocol": "https",
+      "protocol": "http",
       "onAutoForward": "openBrowserOnce",
       "visibility": "public"
     },
     "5810": {
       "label": "NetworkTables (sim)",
-      "protocol": "https",
+      "protocol": "http",
       "onAutoForward": "silent",
       "visibility": "public"
     }
