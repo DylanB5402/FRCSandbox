@@ -31,4 +31,10 @@ fi
 
 cd "$ASCOPE_LITE_DIR"
 setsid "$PYTHON" lite_server.py >"$LOG" 2>&1 </dev/null &
-echo "AdvantageScope Lite started on http://localhost:5808 (log: ${LOG})."
+
+# shellcheck source=codespace-urls.sh
+source "$(cd "$(dirname "$0")" && pwd)/codespace-urls.sh"
+ascope_codespace_urls
+echo "AdvantageScope Lite started (log: ${LOG})."
+echo "  Open: ${ASCOPE_LITE_URL}"
+echo "  NT:   ${ASCOPE_NT_HOST} (WSS via public 5810 forward)"

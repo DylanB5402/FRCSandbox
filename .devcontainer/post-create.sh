@@ -6,10 +6,14 @@ set -euo pipefail
 WPILIB_YEAR="2027_alpha8"
 WPILIB_VER="2027.0.0-alpha-8"
 FRCMAVEN="https://frcmaven.wpi.edu/artifactory/release/org/wpilib/tools"
-# DylanB5402 fork: Lite with hard-coded wss:// for Codespaces HTTPS proxy / NT.
+# WSS Lite for Codespaces: https/wss on public *-5810 forward (:443 at edge).
 ADVANTAGESCOPE_REPO="DylanB5402/AdvantageScope"
-ADVANTAGESCOPE_VER="codespace-wss-1"
+ADVANTAGESCOPE_VER="codespace-wss-2"
 ELASTIC_VER="2027.0.0-alpha10"
+
+# shellcheck source=codespace-urls.sh
+source "$(cd "$(dirname "$0")" && pwd)/codespace-urls.sh"
+ascope_codespace_urls
 
 if [ -n "${XDG_DATA_HOME:-}" ] && [[ "$XDG_DATA_HOME" == /* ]]; then
   WPILIB_HOME="${XDG_DATA_HOME}/wpilib/${WPILIB_YEAR}"
@@ -117,13 +121,36 @@ cp -a "${ASCOPE_LITE_STAGE}/usr/local/bin/advantagescope-lite/." "$ASCOPE_LITE_D
 chmod +x "${ASCOPE_LITE_DIR}/lite_server.py"
 python3 -m venv "${ASCOPE_LITE_DIR}/.venv"
 "${ASCOPE_LITE_DIR}/.venv/bin/pip" install --quiet --disable-pip-version-check "multipart==1.3.0"
+
+# Current WSS Lite auto-connects via preferences.robotAddress (default robot.local).
+# Point that default at the public Codespaces NT host so open → WSS works.
+echo "AdvantageScope Lite default NT host: ${ASCOPE_NT_HOST}"
+python3 - "$ASCOPE_LITE_DIR" "$ASCOPE_NT_HOST" <<'PY'
+import pathlib, sys
+root, host = pathlib.Path(sys.argv[1]), sys.argv[2]
+old = "robot.local"
+for path in root.rglob("*"):
+    if not path.is_file() or path.suffix.lower() in {
+        ".png", ".glb", ".wasm", ".jpg", ".jpeg", ".ico", ".woff", ".woff2"
+    }:
+        continue
+    try:
+        data = path.read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError):
+        continue
+    if old not in data:
+        continue
+    path.write_text(data.replace(old, host), encoding="utf-8")
+    print(f"  patched {path.relative_to(root)}")
+PY
+
 START_LITE_SCRIPT="$(cd "$(dirname "$0")" && pwd)/start-advantagescope-lite.sh"
 cat > "${TOOLS_DIR}/AdvantageScope" <<LAUNCHER
 #!/bin/bash
-# WPILib tool entry: ensure Lite is listening, then print a clickable URL.
+# WPILib tool entry: ensure Lite is listening, then print the Codespaces HTTPS URL.
 bash "${START_LITE_SCRIPT}"
-echo "AdvantageScope Lite: http://localhost:5808"
-echo "Open that link in the integrated browser, then File → Connect to Simulator."
+echo "AdvantageScope Lite: ${ASCOPE_LITE_URL}"
+echo "With sim running, Lite auto-connects to NT at ${ASCOPE_NT_HOST} (WSS :443)."
 LAUNCHER
 chmod +x "${TOOLS_DIR}/AdvantageScope"
 ln -sfn AdvantageScope "${TOOLS_DIR}/advantagescope"
@@ -162,13 +189,14 @@ cat <<EOF
 WPILib 2027 sim container is ready.
 
   Desktop:          open forwarded port 6080 (password: vscode)
-  AdvantageScope:   http://localhost:5808
-                    (integrated browser via remote proxy; Run and Debug → AdvantageScope Lite)
-                    With sim running: File → Connect to Simulator
+  AdvantageScope:   ${ASCOPE_LITE_URL}
+                    (public HTTPS forward; ports 5808 + 5810 must stay public)
+                    With sim running, Lite auto-connects to NT (${ASCOPE_NT_HOST})
   Build:            ./gradlew compileJava
   Sim:              ./gradlew run
                     or Command Palette → WPILib: Simulate Robot Code
 
-The sim GUI appears on the noVNC desktop. AdvantageScope Lite renders in the integrated browser.
+The sim GUI appears on the noVNC desktop. AdvantageScope Lite opens over HTTPS and
+talks to sim NT over WSS via the public 5810 forward.
 
 EOF

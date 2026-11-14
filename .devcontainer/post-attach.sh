@@ -1,9 +1,12 @@
 #!/bin/bash
-# On attach: keep AdvantageScope Lite up and print a clickable URL (opens in the
-# integrated browser when workbench.browser.openLocalhostLinks is enabled).
+# On attach: keep AdvantageScope Lite up and print the public HTTPS URL.
 # On Codespaces, also register the WPILib VSIX (postCreate runs before `code`
 # exists; the Dockerfile already unpacks the extension for local Dev Containers).
 set -euo pipefail
+
+# shellcheck source=codespace-urls.sh
+source "$(cd "$(dirname "$0")" && pwd)/codespace-urls.sh"
+ascope_codespace_urls
 
 bash "$(dirname "$0")/start-advantagescope-lite.sh" || true
 
@@ -17,10 +20,10 @@ done
 
 cat <<EOF
 
-AdvantageScope Lite: http://localhost:5808
-  Open that link (or Run and Debug → "AdvantageScope Lite").
-  With sim running: File → Connect to Simulator (NT on localhost:5810).
-  Integrated browser uses remote proxy — 3D renders on your machine.
+AdvantageScope Lite: ${ASCOPE_LITE_URL}
+  Open that HTTPS link (Ports → 5808, or the URL above).
+  With sim running, Lite auto-connects to NT at ${ASCOPE_NT_HOST} over WSS.
+  Keep ports 5808 and 5810 public.
 
 EOF
 
