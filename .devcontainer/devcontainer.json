@@ -12,6 +12,7 @@
     "memory": "8gb"
   },
   "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/desktop-lite:1": {
       "password": "vscode"
     }
