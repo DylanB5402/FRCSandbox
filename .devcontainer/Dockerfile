@@ -62,4 +62,14 @@ RUN EXT_DIR=/home/vscode/.vscode-server/extensions/wpilibsuite.vscode-wpilib-${W
     && chown -R vscode:vscode /home/vscode/.vscode-server \
     && rm -rf /tmp/vscode-wpilib-unpack /tmp/vscode-wpilib.vsix
 
+# Lifecycle + tool scripts: other projects reference the published image and do
+# not need a local copy of these files.
+COPY install-tools.sh post-create.sh post-attach.sh \
+     codespace-urls.sh start-advantagescope-lite.sh \
+     /usr/local/share/wpilib-dc/
+RUN chmod +x /usr/local/share/wpilib-dc/*.sh
+
 USER vscode
+
+# Bake WPILib desktop tools into the image (Glass, Elastic, AdvantageScope Lite, …).
+RUN bash /usr/local/share/wpilib-dc/install-tools.sh

@@ -4,8 +4,8 @@
     "dockerfile": "Dockerfile"
   },
   "remoteUser": "vscode",
-  "postCreateCommand": "bash .devcontainer/post-create.sh",
-  "postAttachCommand": "bash .devcontainer/post-attach.sh",
+  "postCreateCommand": "bash /usr/local/share/wpilib-dc/post-create.sh",
+  "postAttachCommand": "bash /usr/local/share/wpilib-dc/post-attach.sh",
   "waitFor": "postCreateCommand",
   "hostRequirements": {
     "cpus": 4,
