@@ -88,7 +88,7 @@ fi
 
 cat <<EOF
 
-WPILib 2027 sim container is ready.
+Unofficial WPILib Dev Container is ready.
 
   Desktop:          open forwarded port 6080 (password: vscode)
   AdvantageScope:   ${ASCOPE_LITE_URL}

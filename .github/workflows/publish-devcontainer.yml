@@ -26,10 +26,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Image name
+        id: image
+        run: echo "name=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/unofficial-wpilib-devcontainer" >> "$GITHUB_OUTPUT"
+
       - name: Build and push
         uses: devcontainers/ci@v0.3
         with:
-          imageName: ghcr.io/${{ github.repository_owner }}/wpilib-2027-devcontainer
-          cacheFrom: ghcr.io/${{ github.repository_owner }}/wpilib-2027-devcontainer
+          imageName: ${{ steps.image.outputs.name }}
+          cacheFrom: ${{ steps.image.outputs.name }}
           imageTag: latest,${{ github.sha }}
           push: always

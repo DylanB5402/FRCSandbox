@@ -1,5 +1,5 @@
 {
-  "name": "WPILib 2027 Robot Sim",
+  "name": "Unofficial WPILib Dev Container",
   "build": {
     "dockerfile": "Dockerfile"
   },
